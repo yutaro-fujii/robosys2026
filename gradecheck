@@ -3,36 +3,73 @@
 # SPDX-License-Identifier: BSD-3-Clause
 
 import sys
-from decimal import Decimal, ROUND_CEILING
+from decimal import Decimal, DecimalException, ROUND_CEILING
 
-for line in sys.stdin:
-    data = line.strip().split(",")
+
+def number(text):
+    value = Decimal(text)
+    if not value.is_finite() or not 0 <= value <= 100:
+        raise ValueError("数値は0から100の範囲で入力してください")
+    return value
+
+
+def calculate(line):
+    data = [x.strip() for x in line.strip().split(",")]
+
+    if len(data) < 2 or (len(data) - 2) % 3 != 0:
+        raise ValueError("入力形式が正しくありません")
 
     name = data[0]
-    goal = Decimal(data[1])
 
+    if not name:
+        raise ValueError("科目名がありません")
+
+    goal = number(data[1])
     current = Decimal(0)
     total_weight = Decimal(0)
 
     for i in range(2, len(data), 3):
         item = data[i]
-        score = Decimal(data[i + 1])
-        weight = Decimal(data[i + 2])
+
+        if not item:
+            raise ValueError("評価項目名がありません")
+
+        score = number(data[i + 1])
+        weight = number(data[i + 2])
 
         current += score * weight / 100
         total_weight += weight
 
+    if total_weight > 100:
+        raise ValueError("配点の合計が100%を超えています")
+
     remaining = 100 - total_weight
 
     if current >= goal:
-        print(f"{name},PASS")
+        return f"{name},PASS"
 
-    elif current + remaining < goal:
-        print(f"{name},IMPOSSIBLE")
+    if current + remaining < goal:
+        return f"{name},IMPOSSIBLE"
 
-    else:
-        required = (goal - current) * 100 / remaining
-        required = int(required.to_integral_value(
-            rounding=ROUND_CEILING))
+    required = (goal - current) * 100 / remaining
+    required = int(required.to_integral_value(
+        rounding=ROUND_CEILING))
 
-        print(f"{name},{required}")
+    return f"{name},{required}"
+
+
+status = 0
+count = 0
+
+for count, line in enumerate(sys.stdin, 1):
+    try:
+        print(calculate(line))
+    except (ValueError, DecimalException) as e:
+        print(f"Error: {count}行目: {e}", file=sys.stderr)
+        status = 1
+
+if count == 0:
+    print("Error: 入力がありません", file=sys.stderr)
+    status = 1
+
+sys.exit(status)
