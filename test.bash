@@ -9,20 +9,6 @@ ng () {
 
 res=0
 
-### plus: NORMAL INPUT ###
-out=$(seq 5 | ./plus)
-[ "$?" = 0 ] || ng "$LINENO"
-[ "${out}" = 15 ] || ng "$LINENO"
-
-### plus: STRANGE INPUT ###
-out=$(echo あ | ./plus)
-[ "$?" = 1 ] || ng "$LINENO"
-[ "${out}" = "" ] || ng "$LINENO"
-
-out=$(echo | ./plus)
-[ "$?" = 1 ] || ng "$LINENO"
-[ "${out}" = "" ] || ng "$LINENO"
-
 ### gradecheck: NORMAL INPUT ###
 
 check_ok () {
