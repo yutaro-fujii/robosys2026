@@ -23,9 +23,16 @@ for line in sys.stdin:
         total_weight += weight
 
     remaining = 100 - total_weight
-    required = (goal - current) * 100 / remaining
 
-    required = max(0, int(required.to_integral_value(
-        rounding=ROUND_CEILING)))
+    if current >= goal:
+        print(f"{name},PASS")
 
-    print(f"{name},{required}")
+    elif current + remaining < goal:
+        print(f"{name},IMPOSSIBLE")
+
+    else:
+        required = (goal - current) * 100 / remaining
+        required = int(required.to_integral_value(
+            rounding=ROUND_CEILING))
+
+        print(f"{name},{required}")
