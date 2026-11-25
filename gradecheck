@@ -6,17 +6,25 @@ import sys
 from decimal import Decimal, ROUND_CEILING
 
 for line in sys.stdin:
-    name, mid, mw, task, tw, goal = line.strip().split(",")
+    data = line.strip().split(",")
 
-    mid = Decimal(mid)
-    mw = Decimal(mw)
-    task = Decimal(task)
-    tw = Decimal(tw)
-    goal = Decimal(goal)
+    name = data[0]
+    goal = Decimal(data[1])
 
-    fw = 100 - mw - tw
-    current = (mid * mw + task * tw) / 100
-    required = (goal - current) * 100 / fw
+    current = Decimal(0)
+    total_weight = Decimal(0)
+
+    for i in range(2, len(data), 3):
+        item = data[i]
+        score = Decimal(data[i + 1])
+        weight = Decimal(data[i + 2])
+
+        current += score * weight / 100
+        total_weight += weight
+
+    remaining = 100 - total_weight
+    required = (goal - current) * 100 / remaining
+
     required = max(0, int(required.to_integral_value(
         rounding=ROUND_CEILING)))
 
