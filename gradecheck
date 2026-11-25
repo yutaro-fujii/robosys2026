@@ -1,0 +1,23 @@
+#!/usr/bin/env python3
+# SPDX-FileCopyrightText: 2026 Yutaro Fujii
+# SPDX-License-Identifier: BSD-3-Clause
+
+import sys
+from decimal import Decimal, ROUND_CEILING
+
+for line in sys.stdin:
+    name, mid, mw, task, tw, goal = line.strip().split(",")
+
+    mid = Decimal(mid)
+    mw = Decimal(mw)
+    task = Decimal(task)
+    tw = Decimal(tw)
+    goal = Decimal(goal)
+
+    fw = 100 - mw - tw
+    current = (mid * mw + task * tw) / 100
+    required = (goal - current) * 100 / fw
+    required = max(0, int(required.to_integral_value(
+        rounding=ROUND_CEILING)))
+
+    print(f"{name},{required}")
